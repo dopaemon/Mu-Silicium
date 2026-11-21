@@ -20,6 +20,8 @@ APRIORI DXE {
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
+  INF Binaries/pong/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
+
 
   INF FatPkg/EnhancedFatDxe/Fat.inf
 

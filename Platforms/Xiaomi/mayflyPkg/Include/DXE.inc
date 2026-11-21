@@ -26,6 +26,7 @@
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   INF FatPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  INF Binaries/pong/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
 
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   INF EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf

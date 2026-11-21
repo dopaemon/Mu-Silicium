@@ -6,6 +6,7 @@
 **/
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/AcpiTableUpdateLib.h>
@@ -20,6 +21,11 @@
 #include <Library/BootGraphics.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
+
+#include <Protocol/BlockIo.h>
+#include <Protocol/DiskIo.h>
+#include <Protocol/PartitionInfo.h>
+#include <Uefi/UefiGpt.h>
 
 #include <Configuration/BootDevices.h>
 
@@ -654,6 +660,182 @@ DrawFullUI (IN UINTN SelectedIndex)
   // 7. Footer
   BltDrawStringCentered (1700, "Protected Slot: B (LineageOS Operational)", COLOR_GREEN, COLOR_BG, 2);
   BltDrawStringCentered (1750, "Blob-free Mu-Silicium UEFI  *  hakios-mayfly", COLOR_MUTED, COLOR_BG, 2);
+
+  // Storage partition recognition status
+  EFI_STATUS  Status;
+  UINTN       PartitionCount = 0;
+  EFI_HANDLE *PartHandles    = NULL;
+  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiPartitionInfoProtocolGuid, NULL, &PartitionCount, &PartHandles);
+  if (PartHandles != NULL) {
+    FreePool (PartHandles);
+  }
+  if (!EFI_ERROR (Status) && PartitionCount > 0) {
+    CHAR8 StorageStatus[80];
+    AsciiSPrint (StorageStatus, sizeof (StorageStatus), "Storage: UFS Initialized (%d Partitions Found)", PartitionCount);
+    BltDrawStringCentered (1800, StorageStatus, COLOR_GREEN, COLOR_BG, 2);
+  } else {
+    BltDrawStringCentered (1800, "Storage: Standalone (RAM Boot Mode)", COLOR_MUTED, COLOR_BG, 2);
+  }
+}
+
+#define BOOT_CTRL_MAGIC   0x42414342 /* "BACB" */
+
+STATIC
+EFI_STATUS
+FindPartitionByName (
+  IN  CHAR16                   *TargetName,
+  OUT EFI_BLOCK_IO_PROTOCOL   **OutBlockIo,
+  OUT EFI_PARTITION_ENTRY      *OutGptEntry
+  )
+{
+  EFI_STATUS                  Status;
+  UINTN                       HandleCount = 0;
+  EFI_HANDLE                 *HandleBuffer = NULL;
+  UINTN                       Index;
+  EFI_PARTITION_INFO_PROTOCOL *PartInfo;
+  EFI_BLOCK_IO_PROTOCOL       *BlockIo;
+
+  if (OutBlockIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *OutBlockIo = NULL;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiPartitionInfoProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status) || HandleCount == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[Index],
+                    &gEfiPartitionInfoProtocolGuid,
+                    (VOID **)&PartInfo
+                    );
+    if (EFI_ERROR (Status) || PartInfo == NULL) {
+      continue;
+    }
+
+    if (PartInfo->Type == PARTITION_TYPE_GPT) {
+      if (StrCmp (PartInfo->Info.Gpt.PartitionName, TargetName) == 0) {
+        Status = gBS->HandleProtocol (
+                        HandleBuffer[Index],
+                        &gEfiBlockIoProtocolGuid,
+                        (VOID **)&BlockIo
+                        );
+        if (!EFI_ERROR (Status)) {
+          *OutBlockIo = BlockIo;
+          if (OutGptEntry != NULL) {
+            CopyMem (OutGptEntry, &PartInfo->Info.Gpt, sizeof (EFI_PARTITION_ENTRY));
+          }
+          FreePool (HandleBuffer);
+          return EFI_SUCCESS;
+        }
+      }
+    }
+  }
+
+  FreePool (HandleBuffer);
+  return EFI_NOT_FOUND;
+}
+
+STATIC
+BOOLEAN
+SwitchSlotInMisc (VOID)
+{
+  EFI_STATUS             Status;
+  EFI_BLOCK_IO_PROTOCOL *BlockIo = NULL;
+  EFI_PARTITION_ENTRY    GptEntry;
+  UINT8                 *Buffer = NULL;
+  UINT32                 BlockSize;
+  UINTN                  BufferSize;
+  UINTN                  Offset = 0x800; // 2048 bytes in misc
+  UINT32                 Magic;
+  UINT32                 NewCrc32 = 0;
+
+  Status = FindPartitionByName (L"misc", &BlockIo, &GptEntry);
+  if (EFI_ERROR (Status) || BlockIo == NULL) {
+    return FALSE;
+  }
+
+  BlockSize = BlockIo->Media->BlockSize;
+  if (BlockSize == 0) {
+    BlockSize = 4096;
+  }
+
+  // Read at least 4KB to cover offset 0x800 (2048) and the 32-byte struct
+  BufferSize = ((4096 + BlockSize - 1) / BlockSize) * BlockSize;
+  Buffer     = AllocateZeroPool (BufferSize);
+  if (Buffer == NULL) {
+    return FALSE;
+  }
+
+  Status = BlockIo->ReadBlocks (
+                      BlockIo,
+                      BlockIo->Media->MediaId,
+                      0,
+                      BufferSize,
+                      Buffer
+                      );
+  if (EFI_ERROR (Status)) {
+    FreePool (Buffer);
+    return FALSE;
+  }
+
+  // Check magic at offset 0x800 + 4 (struct bootloader_control: slot_suffix[4] then magic[4])
+  Magic = *(UINT32 *)(Buffer + Offset + 4);
+  if (Magic != BOOT_CTRL_MAGIC) {
+    // Try offset 0 + 4 in case BCB starts at offset 0
+    if (*(UINT32 *)(Buffer + 4) == BOOT_CTRL_MAGIC) {
+      Offset = 0;
+    } else {
+      FreePool (Buffer);
+      return FALSE;
+    }
+  }
+
+  UINT8 *Ctrl = Buffer + Offset;
+  // Ctrl layout:
+  // Offset 0: slot_suffix[4] -> set to "_b\0\0"
+  Ctrl[0] = '_';
+  Ctrl[1] = 'b';
+  Ctrl[2] = '\0';
+  Ctrl[3] = '\0';
+
+  // Offset 4: magic (0x42414342) - preserved
+  // Offset 8: version (1) - preserved
+  // Offset 9..11: flags/reserved - preserved
+  // Offset 12..15: slot_info[0..3]
+  // slot_info[0] (Slot A): lower priority to 14
+  Ctrl[12] = (Ctrl[12] & 0xF0) | 0x0E;
+
+  // slot_info[1] (Slot B): priority=15, tries=7, successful_boot=1 -> 0xFF
+  Ctrl[13] = 0xFF;
+
+  // CRC32 is calculated over the 28 bytes preceding crc32_le (offset 0 to 27)
+  Status = gBS->CalculateCrc32 (Ctrl, 28, &NewCrc32);
+  if (!EFI_ERROR (Status)) {
+    *(UINT32 *)(Ctrl + 28) = NewCrc32;
+  }
+
+  // Write updated blocks back to misc partition
+  Status = BlockIo->WriteBlocks (
+                      BlockIo,
+                      BlockIo->Media->MediaId,
+                      0,
+                      BufferSize,
+                      Buffer
+                      );
+
+  BlockIo->FlushBlocks (BlockIo);
+  FreePool (Buffer);
+
+  return !EFI_ERROR (Status);
 }
 
 STATIC
@@ -683,10 +865,20 @@ ExecuteMenuAction (IN UINTN Index)
 
   switch (Index) {
   case 0: // Boot Android LineageOS (Slot B)
-    ShowActionMessage ("Booting LineageOS...", "Slot B Operational System", COLOR_GREEN);
-    *(volatile UINT32 *)0x146AA000ULL = 0;
-    gBS->Stall (1200000);
-    gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+    ShowActionMessage ("Checking Storage...", "Locating Slot B / misc partition", COLOR_ACCENT_MAC);
+    gBS->Stall (600000);
+
+    if (SwitchSlotInMisc ()) {
+      ShowActionMessage ("Slot B Activated!", "misc partition updated! Cold Rebooting...", COLOR_GREEN);
+      *(volatile UINT32 *)0x146AA000ULL = 0;
+      gBS->Stall (1500000);
+      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+    } else {
+      ShowActionMessage ("Slot Switch via Recovery", "Rebooting to Recovery to switch slot", COLOR_AMBER);
+      *(volatile UINT32 *)0x146AA000ULL = 0x77665502; // Qualcomm Recovery cookie
+      gBS->Stall (1500000);
+      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+    }
     break;
 
   case 1: // Reboot to Recovery
