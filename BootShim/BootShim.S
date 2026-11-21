@@ -17,6 +17,16 @@ _StackSize:
 #endif
 
 _Start:
+  /* Disable Gunyah Hypervisor VM watchdog left running by ABL (SM8475) */
+  mov   x19, x1
+  movz  x0, #0x0005
+  movk  x0, #0x8600, lsl #16
+  mov   x1, #2
+  mov   x2, #0
+  mov   x3, #0
+  smc   #0
+  mov   x1, x19
+
   mov   x4, x1
   ldr   x5, =FD_BASE
   cmp   x4, x5

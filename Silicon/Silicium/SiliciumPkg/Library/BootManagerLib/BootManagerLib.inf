@@ -25,6 +25,7 @@
   SiliciumPkg/SiliciumPkg.dec
 
 [LibraryClasses]
+  BaseLib
   PcdLib
   DebugLib
   AcpiTableUpdateLib
@@ -37,6 +38,7 @@
   BootGraphicsLib
   DevicePathLib
   PrintLib
+  UefiLib
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
