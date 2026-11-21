@@ -3,8 +3,6 @@ APRIORI DXE {
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF QcomPkg/Drivers/IortDtDxe/IortDtDxe.inf
 
-  INF Binaries/mayfly/QcomPkg/Drivers/EnvDxe/EnvDxe.inf
-
   INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
   INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
   INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -13,42 +11,25 @@ APRIORI DXE {
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
+  # Qualcomm Core Hardware Foundation Drivers for UFS
   INF Binaries/mayfly/QcomPkg/Drivers/SmemDxe/SmemDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/DALSYSDxe/DALSYSDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/HWIODxe/HWIODxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/PlatformInfoDxe/PlatformInfoDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ProjectInfoDxe/ProjectInfoDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ULogDxe/ULogDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/IPCCDxe/IPCCDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/CmdDbDxe/CmdDbDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/PwrUtilsDxe/PwrUtilsDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/NpaDxe/NpaDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/RpmhDxe/RpmhDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/VcsDxe/VcsDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ICBDxe/ICBDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ShmBridgeDxe/ShmBridgeDxeLA.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/TzDxe/ScmDxeLA.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/TLMMDxe/TLMMDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/I2CDxe/I2CDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/SPMIDxe/SPMIDxe.inf
 
   INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 
-  INF Binaries/mayfly/QcomPkg/Drivers/PmicDxe/PmicDxeLa.inf
-
+  # Qualcomm UFS Storage Driver & GPT Partition Enumeration
+  INF Binaries/mayfly/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
   INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-
-  INF Binaries/mayfly/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
 
   INF FatPkg/EnhancedFatDxe/Fat.inf
 
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
+  INF Binaries/mayfly/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf
 !else
   INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
 !endif
