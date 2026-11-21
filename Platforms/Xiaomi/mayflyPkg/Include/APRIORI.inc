@@ -15,6 +15,8 @@ APRIORI DXE {
   INF Binaries/mayfly/QcomPkg/Drivers/SmemDxe/SmemDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/DALSYSDxe/DALSYSDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/HWIODxe/HWIODxe.inf
+  INF Binaries/mayfly/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.inf
+  INF Binaries/mayfly/QcomPkg/Drivers/PlatformInfoDxe/PlatformInfoDxe.inf
 
   INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 

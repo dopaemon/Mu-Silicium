@@ -21,11 +21,16 @@
 #include <Library/BootGraphics.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
+#include <Library/UefiBootManagerLib.h>
 
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/PartitionInfo.h>
 #include <Uefi/UefiGpt.h>
+
+STATIC EFI_GUID mSmemProtocolGuid   = { 0xF4E5C7D0, 0xD239, 0x47CB, { 0xAA, 0xCD, 0x7F, 0x66, 0xEF, 0x76, 0x32, 0x38 } };
+STATIC EFI_GUID mDalSysProtocolGuid = { 0xAE37B942, 0x457F, 0x4C91, { 0xA1, 0x96, 0xD9, 0x66, 0x9F, 0xD3, 0x47, 0xA3 } };
+STATIC EFI_GUID mHwioProtocolGuid   = { 0x9E61DE7C, 0x9927, 0x4F28, { 0x9F, 0x3D, 0x32, 0x07, 0x05, 0xD8, 0x18, 0x01 } };
 
 #include <Configuration/BootDevices.h>
 
@@ -661,7 +666,25 @@ DrawFullUI (IN UINTN SelectedIndex)
   BltDrawStringCentered (1700, "Protected Slot: B (LineageOS Operational)", COLOR_GREEN, COLOR_BG, 2);
   BltDrawStringCentered (1750, "Blob-free Mu-Silicium UEFI  *  hakios-mayfly", COLOR_MUTED, COLOR_BG, 2);
 
-  // Storage partition recognition status
+  // Storage partition recognition status & hardware diagnostic
+  VOID *SmemPtr = NULL;
+  VOID *DalPtr  = NULL;
+  VOID *HwioPtr = NULL;
+  EFI_STATUS SmemStat = gBS->LocateProtocol (&mSmemProtocolGuid, NULL, &SmemPtr);
+  EFI_STATUS DalStat  = gBS->LocateProtocol (&mDalSysProtocolGuid, NULL, &DalPtr);
+  EFI_STATUS HwioStat = gBS->LocateProtocol (&mHwioProtocolGuid, NULL, &HwioPtr);
+
+  // Connect any BlockIo handles to PartitionDxe
+  UINTN       BlockIoCount = 0;
+  EFI_HANDLE *BlockHandles = NULL;
+  gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoCount, &BlockHandles);
+  if (BlockHandles != NULL) {
+    for (UINTN b = 0; b < BlockIoCount; b++) {
+      gBS->ConnectController (BlockHandles[b], NULL, NULL, TRUE);
+    }
+    FreePool (BlockHandles);
+  }
+
   EFI_STATUS  Status;
   UINTN       PartitionCount = 0;
   EFI_HANDLE *PartHandles    = NULL;
@@ -669,12 +692,32 @@ DrawFullUI (IN UINTN SelectedIndex)
   if (PartHandles != NULL) {
     FreePool (PartHandles);
   }
+
+  // Refresh BlockIo count
+  BlockHandles = NULL;
+  BlockIoCount = 0;
+  gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoCount, &BlockHandles);
+  if (BlockHandles != NULL) {
+    FreePool (BlockHandles);
+  }
+
   if (!EFI_ERROR (Status) && PartitionCount > 0) {
     CHAR8 StorageStatus[80];
     AsciiSPrint (StorageStatus, sizeof (StorageStatus), "Storage: UFS Initialized (%d Partitions Found)", PartitionCount);
     BltDrawStringCentered (1800, StorageStatus, COLOR_GREEN, COLOR_BG, 2);
   } else {
-    BltDrawStringCentered (1800, "Storage: Standalone (RAM Boot Mode)", COLOR_MUTED, COLOR_BG, 2);
+    CHAR8 DiagStr[100];
+    AsciiSPrint (
+      DiagStr,
+      sizeof (DiagStr),
+      "Diag: SMEM:%a DAL:%a HWIO:%a Blk:%d Part:%d",
+      !EFI_ERROR (SmemStat) ? "OK" : "--",
+      !EFI_ERROR (DalStat) ? "OK" : "--",
+      !EFI_ERROR (HwioStat) ? "OK" : "--",
+      BlockIoCount,
+      PartitionCount
+      );
+    BltDrawStringCentered (1800, DiagStr, COLOR_AMBER, COLOR_BG, 2);
   }
 }
 
@@ -944,9 +987,10 @@ RunDualBootMenu ()
     PostGopSetup (&mGopProtocol);
   }
 
-  // Connect Consoles
+  // Connect Consoles & All Controllers
   EfiBootManagerConnectConsoleVariable (ConIn);
   EfiBootManagerConnectConsoleVariable (ConOut);
+  EfiBootManagerConnectAll ();
 
   // Allocate reusable Blt buffers in system RAM
   mCardBltBuffer = AllocatePool (CARD_W * CARD_H * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
