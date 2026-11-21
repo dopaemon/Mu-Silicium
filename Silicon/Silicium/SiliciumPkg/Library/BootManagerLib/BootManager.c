@@ -987,10 +987,9 @@ RunDualBootMenu ()
     PostGopSetup (&mGopProtocol);
   }
 
-  // Connect Consoles & All Controllers
+  // Connect Consoles
   EfiBootManagerConnectConsoleVariable (ConIn);
   EfiBootManagerConnectConsoleVariable (ConOut);
-  EfiBootManagerConnectAll ();
 
   // Allocate reusable Blt buffers in system RAM
   mCardBltBuffer = AllocatePool (CARD_W * CARD_H * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
