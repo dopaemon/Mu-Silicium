@@ -19,7 +19,6 @@ APRIORI DXE {
   INF Binaries/mayfly/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/PlatformInfoDxe/PlatformInfoDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/ProjectInfoDxe/ProjectInfoDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/HALIOMMUDxe/HALIOMMUDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/ULogDxe/ULogDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/IPCCDxe/IPCCDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
@@ -28,7 +27,6 @@ APRIORI DXE {
   INF Binaries/mayfly/QcomPkg/Drivers/NpaDxe/NpaDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/RpmhDxe/RpmhDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/VcsDxe/VcsDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ClockDxe/ClockDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/ICBDxe/ICBDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/ShmBridgeDxe/ShmBridgeDxeLA.inf
   INF Binaries/mayfly/QcomPkg/Drivers/TzDxe/ScmDxeLA.inf
@@ -44,27 +42,16 @@ APRIORI DXE {
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
-  INF Binaries/mayfly/QcomPkg/Drivers/SdccDxe/SdccDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
 
   INF FatPkg/EnhancedFatDxe/Fat.inf
 
-  INF Binaries/mayfly/QcomPkg/Drivers/TzDxe/TzDxeLA.inf
-
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
-  INF Binaries/mayfly/QcomPkg/Drivers/DDRInfoDxe/DDRInfoDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/FeatureEnablerDxe/FeatureEnablerDxe.inf
-
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
-  INF Binaries/mayfly/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf
 !else
   INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
 !endif
-
-  INF Binaries/mayfly/QcomPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/PILDxe/PILDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/SPSSDxe/SPSSDxe.inf
 
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
@@ -76,30 +63,9 @@ APRIORI DXE {
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 
-  INF Binaries/mayfly/QcomPkg/Drivers/PmicGlinkDxe/PmicGlinkDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/QcomChargerDxe/QcomChargerDxeLA.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ChargerExDxe/ChargerExDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbfnDwc3Dxe/UsbfnDwc3Dxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
-
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbInitDxe/UsbInitDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/TsensDxe/TsensDxe.inf
-!if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
-  INF Binaries/mayfly/QcomPkg/Drivers/CPRDxe/CPRDxe.inf
-!endif
-  INF Binaries/mayfly/QcomPkg/Drivers/GpiDxe/GpiDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UCDxe/UCDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/RNGDxe/RngDxe.inf
 
   INF EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
   INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf

@@ -11,7 +11,6 @@
 
   INF Binaries/mayfly/QcomPkg/Drivers/ShmBridgeDxe/ShmBridgeDxeLA.inf
   INF Binaries/mayfly/QcomPkg/Drivers/TzDxe/ScmDxeLA.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/TzDxe/TzDxeLA.inf
 
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -29,7 +28,6 @@
   INF Binaries/mayfly/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/PlatformInfoDxe/PlatformInfoDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/DALSYSDxe/DALSYSDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/HALIOMMUDxe/HALIOMMUDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/HWIODxe/HWIODxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/I2CDxe/I2CDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/TLMMDxe/TLMMDxe.inf
@@ -48,10 +46,10 @@
   INF Binaries/mayfly/QcomPkg/Drivers/NpaDxe/NpaDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/ULogDxe/ULogDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/VcsDxe/VcsDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ClockDxe/ClockDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/SPMIDxe/SPMIDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/ICBDxe/ICBDxe.inf
   INF Binaries/mayfly/QcomPkg/Drivers/SmemDxe/SmemDxe.inf
+
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   INF EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
   INF MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
@@ -60,40 +58,10 @@
   INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
 
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
-  INF Binaries/mayfly/QcomPkg/Drivers/CPRDxe/CPRDxe.inf
-!endif
-  INF Binaries/mayfly/QcomPkg/Drivers/GpiDxe/GpiDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/SPIDxe/SPIDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/SdccDxe/SdccDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/FeatureEnablerDxe/FeatureEnablerDxe.inf
-
-!if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
-  INF Binaries/mayfly/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf
 !else
   INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
 !endif
 
-  INF Binaries/mayfly/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/ChargerExDxe/ChargerExDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/PmicGlinkDxe/PmicGlinkDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/QcomChargerDxe/QcomChargerDxeLA.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/TsensDxe/TsensDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/LimitsDxe/LimitsDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/DDRInfoDxe/DDRInfoDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbfnDwc3Dxe/UsbfnDwc3Dxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
-
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/UsbInitDxe/UsbInitDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/RNGDxe/RngDxe.inf
-  #INF Binaries/mayfly/QcomPkg/Drivers/PILDxe/PILDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
-  INF Binaries/mayfly/QcomPkg/Drivers/SPSSDxe/SPSSDxe.inf
